@@ -6,6 +6,7 @@ QUEUE_FILE="$BASE_DIR/RESEARCH_QUEUE.txt"
 COMPLETED_FILE="$BASE_DIR/RESEARCH_COMPLETED.txt"
 LOG_FILE="$BASE_DIR/orchestrator/cron_log.md"
 ANTIGRAVITY_BIN="/Users/mac/.antigravity/antigravity/bin/antigravity"
+MAX_PARALLEL=3  # Thay đổi số lượng task song song tại đây
 DATE=$(date +"%Y-%m-%d %H:%M:%S")
 
 # --- INITIALIZATION ---
@@ -18,29 +19,36 @@ if [ ! -s "$QUEUE_FILE" ]; then
     exit 0
 fi
 
-# Đọc topic đầu tiên (ignore empty lines)
-TOPIC=$(grep -v '^$' "$QUEUE_FILE" | head -n 1)
+# Đọc N topics đầu tiên (ignore empty lines)
+TOPICS=$(grep -v '^$' "$QUEUE_FILE" | head -n "$MAX_PARALLEL")
 
-if [ -z "$TOPIC" ]; then
-    echo "[$DATE] Empty queue found. Skipping." >> "$LOG_FILE"
+if [ -z "$TOPICS" ]; then
+    echo "[$DATE] No valid topics found. Skipping." >> "$LOG_FILE"
     exit 0
 fi
 
 echo "---" >> "$LOG_FILE"
-echo "## [$DATE] Cron Trigger: Researching '$TOPIC'" >> "$LOG_FILE"
+echo "## [$DATE] Cron Trigger: Starting $MAX_PARALLEL Parallel Tasks" >> "$LOG_FILE"
 
-# Thực hiện lệnh (đẩy vào chat mode agent)
-# Lưu ý: Lệnh này sẽ mở VS Code và bắt đầu research tự động.
-"$ANTIGRAVITY_BIN" chat --mode agent "/research $TOPIC" >> "$LOG_FILE" 2>&1
-
-if [ $? -eq 0 ]; then
-    echo "[$DATE] ✅ Started research for: $TOPIC" >> "$LOG_FILE"
-    
-    # Di chuyển sang completed và xóa khỏi queue (macOS compatible sed)
-    echo "[$DATE] $TOPIC" >> "$COMPLETED_FILE"
-    # Dùng mẫu temp file để tương thích macOS sed
-    grep -v "^$TOPIC$" "$QUEUE_FILE" > "$QUEUE_FILE.tmp" && mv "$QUEUE_FILE.tmp" "$QUEUE_FILE"
-else
-    echo "[$DATE] ❌ Failed to start research for: $TOPIC" >> "$LOG_FILE"
-    exit 1
-fi
+# Duyệt từng topic và kích hoạt
+echo "$TOPICS" | while IFS= read -r TOPIC; do
+    if [ -n "$TOPIC" ]; then
+        echo "[$DATE] [Parallel] Triggering: '$TOPIC'" >> "$LOG_FILE"
+        
+        # Gọi CLI Antigravity
+        "$ANTIGRAVITY_BIN" chat --mode agent "/research $TOPIC" >> "$LOG_FILE" 2>&1
+        
+        if [ $? -eq 0 ]; then
+             echo "[$DATE] ✅ Started research for: $TOPIC" >> "$LOG_FILE"
+             echo "[$DATE] $TOPIC" >> "$COMPLETED_FILE"
+             
+             # Xóa khỏi queue
+             grep -v "^$TOPIC$" "$QUEUE_FILE" > "$QUEUE_FILE.tmp" && mv "$QUEUE_FILE.tmp" "$QUEUE_FILE"
+        else
+             echo "[$DATE] ❌ Failed to start research for: $TOPIC" >> "$LOG_FILE"
+        fi
+        
+        # Nhịp nghỉ nhẹ để tránh xung đột UI khi mở nhiều tab
+        sleep 2
+    fi
+done
