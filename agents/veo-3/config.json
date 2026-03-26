@@ -1,0 +1,63 @@
+{
+  "agent_id": "veo-3",
+  "topic": "Veo 3 (Google AI Video Generation)",
+  "slug": "veo-3",
+  "created_at": "2026-03-26",
+  "last_active": "2026-03-26",
+  "status": "active",
+  "status_options": ["active", "paused", "archived", "merged"],
+  "archived_reason": null,
+  "merged_into": null,
+  "version": "1.0.0",
+  "research_sessions": 2,
+  "knowledge_packages": 2,
+  "key_areas": [
+    "Architecture & Technology",
+    "Use Cases & Applications",
+    "Competitive Landscape",
+    "Prompt Engineering Best Practices"
+  ],
+  "metadata": {
+    "research_depth": "deep",
+    "language": "vi",
+    "output_format": "markdown",
+    "auto_package": true
+  },
+  "memory_limits": {
+    "episodic_max_sessions": 5,
+    "semantic_max_lines": 200,
+    "learnings_max_lines": 100,
+    "archive_after": 5
+  },
+  "memory": {
+    "episodic": "memory/episodic.md",
+    "episodic_archive": "memory/episodic-archive.md",
+    "semantic": "memory/semantic.md",
+    "learnings": "memory/learnings.md"
+  },
+  "output_paths": {
+    "raw": "research/raw/",
+    "knowledge_draft": "research/knowledge/",
+    "knowledge_published": "../../knowledge-base/veo-3/"
+  },
+  "research_history": [
+    {
+      "session": 1,
+      "date": "2026-03-26",
+      "topic": "Comprehensive Overview — Technology, Competitive Landscape, API, Audio",
+      "package": "2026-03-26-veo-3.md",
+      "confidence": "high",
+      "sources_count": 10
+    },
+    {
+      "session": 2,
+      "date": "2026-03-26",
+      "topic": "Prompt Engineering Best Practices",
+      "package": "2026-03-26-veo-3-prompt-best-practices.md",
+      "confidence": "high",
+      "sources_count": 6
+    }
+  ],
+  "tags": ["ai", "video-generation", "google", "deepmind", "audio-sync", "4k", "prompt-engineering"],
+  "related_agents": []
+}
