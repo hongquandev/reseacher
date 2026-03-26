@@ -17,6 +17,13 @@ Mỗi agent con là một chuyên gia độc lập với memory, learning, và k
 User Request → Orchestrator → Spawn/Activate Agent → Context Checkpoint → Research → Quality Gate → Package Knowledge
 ```
 
+### ⚡ Background Execution (Spawning)
+Hệ thống hỗ trợ cơ chế "giao việc và quên" (Assign and Forget):
+1. **Lệnh**: Sử dụng script `scripts/spawn-agent.sh {topic}`.
+2. **Cơ chế**: Orchestrator khởi tạo một instance CLI mới chạy trong tab/tiến trình riêng.
+3. **Ưu điểm**: Xử lý đa nhiệm, không chiếm dụng phiên chat hiện tại.
+4. **Theo dõi**: Kiểm tra `orchestrator/log.md` hoặc các file memory của agent tương ứng.
+
 ### Thành phần chính:
 1. **Orchestrator** (`orchestrator/`): Điều phối, phân tích yêu cầu, tạo/kích hoạt agent
    - `AGENT.md` — Orchestrator prompt & decision framework
